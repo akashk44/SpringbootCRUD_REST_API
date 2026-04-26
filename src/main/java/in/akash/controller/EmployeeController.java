@@ -2,13 +2,17 @@ package in.akash.controller;
 
 import in.akash.entity.Employee;
 import in.akash.service.EmployeeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.net.ssl.SSLEngineResult;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -27,7 +31,7 @@ public class EmployeeController {
     }
 
     @PostMapping(value = "/save", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Employee> EmployeeSave(@RequestBody Employee employee) {
+    public ResponseEntity<Employee> EmployeeSave( @Valid @RequestBody Employee employee) {
         try {
             Employee e = employeeService.saveEmployee(employee);
             return new ResponseEntity<Employee>(e, HttpStatus.CREATED);
@@ -76,6 +80,16 @@ public class EmployeeController {
             return new ResponseEntity<List<Employee>>(HttpStatus.NO_CONTENT);
         else
             return new ResponseEntity<List<Employee>>(list, HttpStatus.OK);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String,String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String,String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            errors.put(error.getField(), error.getDefaultMessage());
+        });
+        return errors;
     }
 
 }

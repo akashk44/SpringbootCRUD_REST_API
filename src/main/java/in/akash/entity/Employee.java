@@ -1,9 +1,10 @@
 package in.akash.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,8 +17,14 @@ import lombok.NoArgsConstructor;
 public class Employee {
 
     @Id
+    @Positive(message = "{emp.empno.not.negative}")
     private Integer empno;
+
+    @NotBlank(message = "{emp.name.not.blank}")
     private String name;
+
+    @Positive(message = "Salary must be positive")
+    @NotNull(message = "Salary cannot be null")
     private Double sal;
 
     public Integer getEmpno() {
