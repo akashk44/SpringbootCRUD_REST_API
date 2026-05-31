@@ -2,6 +2,11 @@ package in.akash.controller;
 
 import in.akash.entity.Employee;
 import in.akash.service.EmployeeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "Employee Controller", description = "Controller for Employee CRUD operations")
 @RestController
 @RequestMapping(value = "/api")
 public class EmployeeController {
@@ -21,15 +27,20 @@ public class EmployeeController {
     @Autowired
     EmployeeService employeeService;
 
+    @Operation(summary = "Get Employee by ID", description = "Fetches an employee by their ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Employee found and returned successfully"),
+            @ApiResponse(responseCode = "404", description = "Employee not found with the given ID")
+    })
     @GetMapping(value = "/Employee/{id}", produces = "application/json")
-    public ResponseEntity<Employee> GetEmployee(@PathVariable Integer id) {
+    public ResponseEntity<Employee> GetEmployee(@Parameter(description = "ID of the employee to fetch") @PathVariable Integer id) {
         Employee e = employeeService.fetchById(id);
         if (e == null)
             return ResponseEntity.notFound().build();
         else
             return new ResponseEntity<Employee>(e, HttpStatus.OK);
     }
-
+    @Operation(summary = "Create a new Employee", description = "Saves a new employee to the database")
     @PostMapping(value = "/save", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Employee> EmployeeSave( @Valid @RequestBody Employee employee) {
         try {
